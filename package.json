@@ -7,7 +7,8 @@
     "dev": "npx remotion studio src/index.ts",
     "build": "npx remotion bundle src/index.ts",
     "render": "npx remotion render src/index.ts JensenPV out/jensen-guimixinqiao-pv.mp4",
-    "still": "npx remotion still src/index.ts JensenPV"
+    "still": "npx remotion still src/index.ts JensenPV",
+    "cover": "npx remotion still src/index.ts Cover4x3 out/cover-4x3.jpg --image-format=jpeg --jpeg-quality=94"
   },
   "dependencies": {
     "@fontsource/ibm-plex-mono": "^5.2.0",
