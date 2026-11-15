@@ -1,0 +1,8 @@
+node_modules/
+out/
+dist/
+.remotion/
+*.log
+.DS_Store
+qa_*.jpg
+qa_*.png
