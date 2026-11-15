@@ -1,8 +1,9 @@
 import React from "react";
-import { interpolate, spring, useVideoConfig } from "remotion";
+import { interpolate } from "remotion";
+import { useVideoConfig } from "remotion";
 import { COLORS, FONTS } from "../design/tokens";
-import { getActiveLyric } from "../data/lyrics";
-import { useAudioFrame, useGlobalFrame } from "../data/audio";
+import { getActiveLyric, getActiveSpokenCue } from "../data/lyrics";
+import { useGlobalFrame } from "../data/audio";
 
 export const CinemaLyrics: React.FC<{ accentColor?: string }> = ({
   accentColor = COLORS.nvLime,
@@ -10,98 +11,152 @@ export const CinemaLyrics: React.FC<{ accentColor?: string }> = ({
   const frame = useGlobalFrame();
   const { fps } = useVideoConfig();
   const sec = frame / fps;
-  const audio = useAudioFrame();
   const { current } = getActiveLyric(sec);
+  const spoken = getActiveSpokenCue(sec);
 
-  // Rule 3: ONLY render currently active sung lyrics; NO small preview line, NO black card/band
-  if (!current) return null;
+  // Clean zero-box corner spoken dialogue (bottom-left corner — never centered!)
+  const renderSpokenCorner = () => {
+    if (!spoken) return null;
+    const inOp = interpolate(sec, [spoken.startSec, spoken.startSec + 0.12], [0, 1], {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    });
+    const outOp = interpolate(sec, [spoken.endSec - 0.16, spoken.endSec], [1, 0], {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    });
+    const opacity = inOp * outOp;
+    const shiftY = (1 - inOp) * 6;
 
-  const enterProgress = spring({
-    frame: Math.max(0, Math.round((sec - current.startSec) * fps)),
-    fps,
-    config: { damping: 24, stiffness: 200, mass: 0.8 },
+    return (
+      <div
+        style={{
+          position: "absolute",
+          left: 72,
+          bottom: 54,
+          maxWidth: 660,
+          pointerEvents: "none",
+          zIndex: 72,
+          opacity,
+          transform: `translateY(${shiftY}px)`,
+          textAlign: "left",
+        }}
+      >
+        <div
+          style={{
+            fontFamily: FONTS.serif,
+            fontWeight: 600,
+            fontSize: 28,
+            lineHeight: 1.48,
+            letterSpacing: "0.04em",
+            color: COLORS.ivory,
+            whiteSpace: "pre-line",
+            textShadow:
+              "0 2px 12px rgba(0,0,0,0.98), 0 0 28px rgba(0,0,0,0.95), 0 1px 3px rgba(0,0,0,1)",
+          }}
+        >
+          {spoken.text}
+        </div>
+      </div>
+    );
+  };
+
+  if (!current) {
+    return renderSpokenCorner();
+  }
+
+  // Crisp fast 100ms pre-downbeat settle so text is 100% legible BEFORE the first sung syllable
+  const enterOpacity = interpolate(sec, [current.startSec, current.startSec + 0.1], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
   });
-
-  const exitOpacity = interpolate(sec, [current.endSec - 0.18, current.endSec], [1, 0], {
+  const enterY = interpolate(sec, [current.startSec, current.startSec + 0.12], [8, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
-  const sweepPct = interpolate(sec, [current.startSec, current.singEndSec], [0, 100], {
+  const exitOpacity = interpolate(sec, [current.endSec - 0.14, current.endSec], [1, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  const sweepPct = interpolate(sec, [current.singStartSec, current.singEndSec], [0, 100], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
   return (
-    <div
-      style={{
-        position: "absolute",
-        left: 0,
-        right: 0,
-        bottom: 46,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        pointerEvents: "none",
-        zIndex: 70,
-      }}
-    >
+    <>
+      {renderSpokenCorner()}
       <div
         style={{
-          position: "relative",
-          opacity: exitOpacity * Math.min(1, enterProgress * 1.4),
-          transform: `translateY(${(1 - enterProgress) * 14}px) scale(${
-            0.99 + enterProgress * 0.01 + audio.mid * 0.008
-          })`,
+          position: "absolute",
+          left: 0,
+          right: 0,
+          bottom: 46,
           padding: "0 80px",
-          textAlign: "center",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          pointerEvents: "none",
+          zIndex: 70,
         }}
       >
-        {/* Base atmospheric un-swept silhouette */}
         <div
           style={{
-            fontFamily: FONTS.serif,
-            fontWeight: 800,
-            fontSize: 48,
-            lineHeight: 1.24,
-            letterSpacing: "0.09em",
-            color: "rgba(244, 239, 230, 0.42)",
-            textShadow:
-              "0 3px 16px rgba(0,0,0,0.98), 0 0 34px rgba(0,0,0,0.92), 0 1px 4px rgba(0,0,0,1)",
-            whiteSpace: "nowrap",
+            position: "relative",
+            display: "inline-block",
+            opacity: exitOpacity * enterOpacity,
+            transform: `translateY(${enterY}px)`,
+            textAlign: "center",
           }}
         >
-          {current.text}
-        </div>
-
-        {/* Karaoke luminous illumination sweep */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            padding: "0 80px",
-            fontFamily: FONTS.serif,
-            fontWeight: 800,
-            fontSize: 48,
-            lineHeight: 1.24,
-            letterSpacing: "0.09em",
-            color: "#FFFFFF",
-            textShadow: `0 0 22px ${accentColor}77, 0 3px 16px rgba(0,0,0,0.98)`,
-            whiteSpace: "nowrap",
-            clipPath: `inset(-20% ${100 - sweepPct}% -20% 0%)`,
-          }}
-        >
-          <span
+          {/* Base atmospheric un-swept silhouette */}
+          <div
             style={{
-              background: `linear-gradient(90deg, #FFFFFF 0%, #FFF7ED 72%, ${accentColor} 100%)`,
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
+              fontFamily: FONTS.serif,
+              fontWeight: 800,
+              fontSize: 48,
+              lineHeight: 1.24,
+              letterSpacing: "0.09em",
+              color: "rgba(244, 239, 230, 0.58)",
+              textShadow:
+                "0 3px 16px rgba(0,0,0,0.98), 0 0 34px rgba(0,0,0,0.92), 0 1px 4px rgba(0,0,0,1)",
+              whiteSpace: "nowrap",
             }}
           >
             {current.text}
-          </span>
+          </div>
+
+          {/* Karaoke luminous illumination sweep (tightly fitted to glyph box) */}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              fontFamily: FONTS.serif,
+              fontWeight: 800,
+              fontSize: 48,
+              lineHeight: 1.24,
+              letterSpacing: "0.09em",
+              color: "#FFFFFF",
+              textShadow: `0 0 22px ${accentColor}77, 0 3px 16px rgba(0,0,0,0.98)`,
+              whiteSpace: "nowrap",
+              clipPath: `inset(-20% ${100 - sweepPct}% -20% 0%)`,
+            }}
+          >
+            <span
+              style={{
+                background: `linear-gradient(90deg, #FFFFFF 0%, #FFF7ED 72%, ${accentColor} 100%)`,
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              {current.text}
+            </span>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
+

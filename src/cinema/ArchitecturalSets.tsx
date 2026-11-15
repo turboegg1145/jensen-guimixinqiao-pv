@@ -50,7 +50,7 @@ export const CrimsonCandlestickDeluge: React.FC<{
         const speed = 7 + (c % 5) * 3.5;
         const y = ((s * 1400 + frame * speed * intensity) % 1500) - 380;
         const x = 140 + c * 96 + Math.sin(c * 2.1) * 24;
-        const bodyH = 120 + (c % 4) * 65 + audio.bass * 90;
+        const bodyH = 130 + (c % 4) * 65 + audio.rms * 28;
         const widthPx = c % 3 === 0 ? 32 : 18;
         const z = -220 + (c % 6) * 85;
         return (

@@ -1,37 +1,35 @@
 import React from "react";
 import { interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { COLORS } from "../design/tokens";
-import { useAudioFrame } from "../data/audio";
 import { CinemaStage } from "../cinema/CinemaStage";
 import { PhotoBackdrop, PhotoCutout } from "../cinema/PhotoMedia";
 import { GpuRig3D } from "../cinema/HardwareProps";
 
-// Stanza 1 (39.89s - 55.82s, 956 frames)
+// Stanza 1 (39.52s - 55.52s, 960 frames / 16.00s)
 export const Scene01Act1Verse1: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const sec = frame / fps;
-  const audio = useAudioFrame();
 
-  const b0 = sec < 3.8; // 曾经真以为皮衣穿到老了
-  const b1 = sec >= 3.8 && sec < 7.94; // 卖卡的心拒绝再有浪潮
-  const b2 = sec >= 7.94 && sec < 11.92; // 禁了千次的芯片却断不了
-  const b3 = sec >= 11.92; // 四十八亿它将我围绕
+  const b0 = sec < 4.0; // 曾经真以为皮衣穿到老了
+  const b1 = sec >= 4.0 && sec < 8.0; // 卖卡的心拒绝再有浪潮
+  const b2 = sec >= 8.0 && sec < 12.0; // 禁了千次的芯片却断不了
+  const b3 = sec >= 12.0; // 四十八亿它将我围绕
 
-  const b0Spring = spring({ frame, fps, config: { damping: 22, stiffness: 90 } });
-  const b1Fly = interpolate(sec, [3.8, 7.94], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const b2Break = interpolate(sec, [9.2, 11.5], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const b3Rise = spring({ frame: Math.max(0, frame - Math.round(11.92 * fps)), fps, config: { damping: 18, stiffness: 110 } });
+  const b0Spring = spring({ frame, fps, config: { damping: 24, stiffness: 120 } });
+  const b1Fly = interpolate(sec, [4.0, 8.0], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const b2Break = interpolate(sec, [8.6, 11.4], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const b3Rise = spring({ frame: Math.max(0, frame - Math.round(11.9 * fps)), fps, config: { damping: 22, stiffness: 135 } });
 
   return (
     <CinemaStage
       mood={b2 ? "crimsonAlarm" : "emeraldVault"}
-      camRotateX={b1 ? 9 : 2}
-      camRotateY={b0 ? -4 : b1 ? 6 : Math.sin(sec * 1.4) * 5}
-      camZ={b1 ? b1Fly * 160 : 0}
-      rain={b2 ? 0.45 : 0.14}
-      bokeh={0.75}
-      anamorphicFlare={0.65}
+      camRotateX={b1 ? 7 : 1.5}
+      camRotateY={b0 ? -3 : b1 ? 4 : Math.sin(sec * 0.4) * 2.2}
+      camZ={b1 ? b1Fly * 150 : 0}
+      rain={b2 ? 0.42 : 0.14}
+      bokeh={0.74}
+      anamorphicFlare={0.62}
     >
       {/* Beat 0: Sweeping Mirror Beam Over Real Jensen Front Portrait & Empty Leather Jacket */}
       {b0 && (
@@ -62,13 +60,12 @@ export const Scene01Act1Verse1: React.FC = () => {
             <PhotoCutout id="jensen_front" tone="emerald" rimColor={COLORS.nvLime} rimPx={28} height={820} />
           </div>
 
-          {/* Sweeping prism reflection beam */}
           <svg viewBox="0 0 1920 1080" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.48 }}>
             <polygon points="0,0 540,0 240,1080 0,1080" fill="rgba(166,240,22,0.08)" />
             <line
-              x1={interpolate(sec, [0, 3.8], [320, 1480])}
+              x1={interpolate(sec, [0, 4.0], [320, 1480])}
               y1="0"
-              x2={interpolate(sec, [0, 3.8], [80, 1220])}
+              x2={interpolate(sec, [0, 4.0], [80, 1220])}
               y2="1080"
               stroke="rgba(255,255,255,0.28)"
               strokeWidth="3"
@@ -146,7 +143,7 @@ export const Scene01Act1Verse1: React.FC = () => {
                   d={`M -80 ${580 + yShift} C 460 ${140 + yShift}, 1460 ${920 - yShift}, 2000 ${460 + yShift}`}
                   fill="none"
                   stroke={COLORS.nvLime}
-                  strokeWidth={6 + audio.pulse * 4}
+                  strokeWidth={6.5}
                   strokeDasharray="1600"
                   strokeDashoffset={1600 * (1 - b2Break)}
                 />
@@ -156,7 +153,7 @@ export const Scene01Act1Verse1: React.FC = () => {
         </div>
       )}
 
-      {/* Beat 3: Real Jensen Portrait Surrounded by 48 Orbiting Glowing Chips & GPUs */}
+      {/* Beat 3: Real Jensen Portrait Surrounded by 48 Smooth Orbiting Glowing Chips */}
       {b3 && (
         <div style={{ position: "absolute", inset: 0, transformStyle: "preserve-3d" }}>
           <PhotoBackdrop id="servers" tone="emerald" opacity={0.48} scale={1.1} blurPx={4} />
@@ -165,7 +162,7 @@ export const Scene01Act1Verse1: React.FC = () => {
               position: "absolute",
               left: "50%",
               bottom: 0,
-              transform: `translate(-50%, 0) translateZ(-40px) scale(${0.88 + b3Rise * 0.14})`,
+              transform: `translate(-50%, 0) translateZ(-40px) scale(${0.9 + b3Rise * 0.12})`,
               opacity: b3Rise,
             }}
           >
@@ -173,12 +170,12 @@ export const Scene01Act1Verse1: React.FC = () => {
           </div>
 
           {Array.from({ length: 48 }).map((_, i) => {
-            const angle = (i / 48) * Math.PI * 2 + (sec - 11.92) * 1.45;
-            const radiusX = 680 + Math.sin(i * 0.8 + sec * 3) * 70;
+            const angle = (i / 48) * Math.PI * 2 + (sec - 12.0) * 1.05;
+            const radiusX = 680 + Math.sin(i * 0.8) * 50;
             const radiusZ = 420;
             const x = 960 + Math.cos(angle) * radiusX;
             const z = Math.sin(angle) * radiusZ;
-            const y = 490 + Math.sin(angle * 2 + sec * 2) * 170;
+            const y = 490 + Math.sin(angle * 2) * 155;
             const sc = Math.max(0.28, (z + 650) / 1000);
             const isGold = i % 6 === 0;
             return (
@@ -208,3 +205,4 @@ export const Scene01Act1Verse1: React.FC = () => {
     </CinemaStage>
   );
 };
+

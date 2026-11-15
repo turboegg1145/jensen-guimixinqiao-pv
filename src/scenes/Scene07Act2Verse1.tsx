@@ -5,35 +5,35 @@ import { useAudioFrame } from "../data/audio";
 import { CinemaStage } from "../cinema/CinemaStage";
 import { DocPlate, PhotoBackdrop, PhotoCutout } from "../cinema/PhotoMedia";
 
-// Stanza 6 / Act 2 Verse 1 (153.66s - 169.73s, 964 frames)
+// Stanza 6 / Act 2 Verse 1 (153.52s - 169.52s, 960 frames / 16.00s)
 export const Scene07Act2Verse1: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const sec = frame / fps;
   const audio = useAudioFrame();
 
-  const b0 = sec < 3.89; // 曾经真的以为写封信就过了
-  const b1 = sec >= 3.89 && sec < 8.08; // 纽约时报反手又是一刀
-  const b2 = sec >= 8.08 && sec < 12.03; // 医疗部的女高管也瞒不了
-  const b3 = sec >= 12.03; // 董事会在深夜里咆哮
+  const b0 = sec < 4.0; // 曾经真的以为写封信就过了
+  const b1 = sec >= 4.0 && sec < 8.0; // 纽约时报反手又是一刀
+  const b2 = sec >= 8.0 && sec < 12.0; // 医疗部的女高管也瞒不了
+  const b3 = sec >= 12.0; // 董事会在深夜里咆哮
 
   const planeX = interpolate(sec, [0, 3.8], [260, 1520], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const slashProg = spring({
-    frame: Math.max(0, frame - Math.round(4.2 * fps)),
+    frame: Math.max(0, frame - Math.round(3.95 * fps)),
     fps,
-    config: { damping: 14, stiffness: 210 },
+    config: { damping: 20, stiffness: 165 },
   });
-  const doorPart = interpolate(sec, [8.2, 11.4], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const doorPart = interpolate(sec, [8.0, 11.4], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
   return (
     <CinemaStage
       mood={b0 ? "noirGold" : b1 || b3 ? "crimsonAlarm" : "rainyBlue"}
-      camRotateX={b3 ? 12 : 2}
-      camRotateY={b0 ? -2 : b1 ? 4 : 0}
-      camZ={b3 ? (sec - 12.03) * 26 : 0}
+      camRotateX={b3 ? 10 : 2}
+      camRotateY={b0 ? -2 : b1 ? 3.5 : 0}
+      camZ={b3 ? (sec - 12.0) * 24 : 0}
       rain={b2 ? 0.25 : 0.14}
       bokeh={0.62}
-      anamorphicFlare={b1 ? 0.95 : 0.55}
+      anamorphicFlare={b1 ? 0.92 : 0.55}
     >
       {/* Beat 0: Calm Golden Gliding Letter Page Over Subdued Backdrop */}
       {b0 && (
@@ -54,9 +54,9 @@ export const Scene07Act2Verse1: React.FC = () => {
             style={{
               position: "absolute",
               left: planeX,
-              top: 465 + Math.sin(sec * 2.1) * 28,
+              top: 465 + Math.sin(sec * 1.4) * 24,
               transform: `translate(-50%, -50%) rotateX(52deg) rotateY(-18deg) rotateZ(${
-                -10 + Math.cos(sec * 2.1) * 8
+                -10 + Math.cos(sec * 1.4) * 6
               }deg)`,
             }}
           >
@@ -172,19 +172,19 @@ export const Scene07Act2Verse1: React.FC = () => {
         </div>
       )}
 
-      {/* Beat 3: "董事会在深夜里咆哮" — Midnight Corporate Boardroom Pulsing With Crimson Shockwaves */}
+      {/* Beat 3: "董事会在深夜里咆哮" — Midnight Corporate Boardroom Smooth Push-In + Shockwaves */}
       {b3 && (
         <div style={{ position: "absolute", inset: 0, transformStyle: "preserve-3d" }}>
           <PhotoBackdrop
             id="boardroom"
             tone="crimson"
             opacity={0.78}
-            scale={1.08 + audio.bass * 0.05}
+            scale={1.06 + (sec - 12.0) * 0.02}
             blurPx={1}
           />
           <svg viewBox="0 0 1920 1080" style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}>
             {[0, 1, 2, 3].map((w) => {
-              const prog = ((sec - 12.03) * 1.15 + w * 0.25) % 1;
+              const prog = ((sec - 12.0) * 0.85 + w * 0.25) % 1;
               return (
                 <circle
                   key={w}
@@ -193,8 +193,8 @@ export const Scene07Act2Verse1: React.FC = () => {
                   r={180 + prog * 700}
                   fill="none"
                   stroke={COLORS.crimson}
-                  strokeWidth={(1 - prog) * (8 + audio.pulse * 12)}
-                  opacity={(1 - prog) * 0.85}
+                  strokeWidth={(1 - prog) * (8 + audio.rms * 8)}
+                  opacity={(1 - prog) * 0.82}
                 />
               );
             })}

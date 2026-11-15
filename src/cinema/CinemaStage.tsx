@@ -172,9 +172,9 @@ export const CinemaStage: React.FC<CinemaStageProps> = ({
           ((ry * height + Math.sin(frame * 0.012 + b) * (18 + depth * 28) + height) %
             (height + 200)) -
           100;
-        const r = 16 + depth * 64 + audio.high * 12;
+        const r = 18 + depth * 62;
         const orbCol = b % 3 === 0 ? cfg.secondary : cfg.primary;
-        const aMid = Math.min(0.24, (0.045 + (1 - depth * 0.4) * 0.09) * bokeh);
+        const aMid = Math.min(0.22, (0.045 + (1 - depth * 0.4) * 0.085) * bokeh);
         const bg = ctx.createRadialGradient(driftX, driftY, r * 0.15, driftX, driftY, r);
         bg.addColorStop(0, `${orbCol}${Math.round(aMid * 255).toString(16).padStart(2, "0")}`);
         bg.addColorStop(0.75, `${orbCol}${Math.round(aMid * 150).toString(16).padStart(2, "0")}`);
@@ -186,10 +186,10 @@ export const CinemaStage: React.FC<CinemaStageProps> = ({
       }
     }
 
-    // 4. Anamorphic horizontal lens flare across frame when pulse hits
+    // 4. Anamorphic horizontal lens flare across frame (smooth breathing without twitch)
     if (anamorphicFlare > 0.02) {
-      const flareAlpha = Math.min(0.45, (0.08 + audio.pulse * 0.34) * anamorphicFlare);
-      const flareY = height * (0.34 + Math.sin(frame * 0.008) * 0.14);
+      const flareAlpha = Math.min(0.42, (0.1 + audio.rms * 0.24) * anamorphicFlare);
+      const flareY = height * (0.34 + Math.sin(frame * 0.006) * 0.1);
       const fg = ctx.createLinearGradient(0, flareY, width, flareY);
       fg.addColorStop(0, "rgba(0,0,0,0)");
       fg.addColorStop(0.2, `${cfg.flare}18`);
@@ -238,16 +238,10 @@ export const CinemaStage: React.FC<CinemaStageProps> = ({
     }
   }, [frame, width, height, audio, cfg, rain, bokeh, anamorphicFlare, smoke]);
 
-  // Organic 35mm handheld breath + sharp bass thud
-  const breathX = Math.sin(frame * 0.017) * 5 + Math.cos(frame * 0.029) * 2.5;
-  const breathY = Math.cos(frame * 0.014) * 3.5 + Math.sin(frame * 0.023) * 1.8;
-  const beatKickX = Math.sin(frame * 1.9) * audio.pulse * 6 * beatShake;
-  const beatKickY = Math.cos(frame * 2.5) * audio.pulse * 4.5 * beatShake;
-  const beatKickZ = audio.bass * 18 * beatShake;
-
-  // Deterministic film grain offset
-  const grainOffsetX = Math.round((hash01(frame * 3.1) - 0.5) * 40);
-  const grainOffsetY = Math.round((hash01(frame * 7.7) - 0.5) * 40);
+  // Pure silky 35mm gimbal float — ZERO high-frequency shake or bass camera thumping
+  const sec = frame / 60;
+  const breathX = Math.sin(sec * 0.42) * 4.0 + Math.cos(sec * 0.65) * 1.8;
+  const breathY = Math.cos(sec * 0.36) * 2.8 + Math.sin(sec * 0.52) * 1.2;
 
   return (
     <div
@@ -290,12 +284,10 @@ export const CinemaStage: React.FC<CinemaStageProps> = ({
             position: "absolute",
             inset: 0,
             transformStyle: "preserve-3d",
-            transform: `translate3d(${camX + breathX + beatKickX}px, ${
-              camY + breathY + beatKickY
-            }px, ${camZ + beatKickZ}px) rotateX(${
-              camRotateX + Math.cos(frame * 0.011) * 0.45
+            transform: `translate3d(${camX + breathX}px, ${camY + breathY}px, ${camZ}px) rotateX(${
+              camRotateX + Math.cos(sec * 0.32) * 0.3
             }deg) rotateY(${
-              camRotateY + Math.sin(frame * 0.013) * 0.65
+              camRotateY + Math.sin(sec * 0.36) * 0.4
             }deg) rotateZ(${camRotateZ}deg)`,
           }}
         >
@@ -319,14 +311,13 @@ export const CinemaStage: React.FC<CinemaStageProps> = ({
         />
       )}
 
-      {/* Subtle 35mm film grain texture via SVG fractal filter */}
+      {/* Subtle steady analog film texture (no frame-by-frame flicker) */}
       <div
         style={{
           position: "absolute",
-          inset: -50,
+          inset: 0,
           pointerEvents: "none",
-          opacity: 0.045,
-          transform: `translate(${grainOffsetX}px, ${grainOffsetY}px)`,
+          opacity: 0.022,
           backgroundImage:
             "repeating-radial-gradient(circle at 22% 33%, rgba(255,255,255,0.65) 0, rgba(0,0,0,0.65) 1px, transparent 2px)",
           backgroundSize: "6px 6px",

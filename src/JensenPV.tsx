@@ -1,17 +1,9 @@
 import React from "react";
-import {
-  AbsoluteFill,
-  Audio,
-  Sequence,
-  staticFile,
-  useCurrentFrame,
-  useVideoConfig,
-} from "remotion";
+import { AbsoluteFill, Audio, Sequence, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import "./fonts.css";
 import { COLORS, secToFrame } from "./design/tokens";
-import { GlobalFrameProvider, useAudioFrame } from "./data/audio";
+import { GlobalFrameProvider } from "./data/audio";
 import { CinemaLyrics } from "./cinema/CinemaLyrics";
-import { GlitchOverlay } from "./components/GlitchOverlay";
 import { Scene00Intro } from "./scenes/Scene00Intro";
 import { Scene01Act1Verse1 } from "./scenes/Scene01Act1Verse1";
 import { Scene02Act1Verse2 } from "./scenes/Scene02Act1Verse2";
@@ -25,57 +17,13 @@ import { Scene09Act2Chorus1 } from "./scenes/Scene09Act2Chorus1";
 import { Scene10Act2Chorus2 } from "./scenes/Scene10Act2Chorus2";
 import { Scene11FinalAndOutro } from "./scenes/Scene11FinalAndOutro";
 
-const CUT_FRAMES = [
-  secToFrame(39.89),
-  secToFrame(55.82),
-  secToFrame(71.94),
-  secToFrame(88.1),
-  secToFrame(105.86),
-  secToFrame(121.9),
-  secToFrame(153.66),
-  secToFrame(169.73),
-  secToFrame(186.02),
-  secToFrame(201.99),
-  secToFrame(220.06),
-];
-
-const SceneGlitchLayer: React.FC = () => {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-  const sec = frame / fps;
-  const audio = useAudioFrame();
-
-  let cutGlitch = 0;
-  for (const cut of CUT_FRAMES) {
-    const dist = Math.abs(frame - cut);
-    if (dist <= 7) {
-      cutGlitch = Math.max(cutGlitch, (1 - dist / 7) * 0.75);
-    }
-  }
-
-  const dropGlitch =
-    sec > 72 && sec < 220 && audio.pulse > 0.82
-      ? (audio.pulse - 0.82) * 1.9
-      : 0;
-
-  const intensity = Math.min(1, Math.max(cutGlitch, dropGlitch));
-  const tint =
-    sec >= 197.77 && sec < 201.99
-      ? COLORS.amdRed
-      : sec >= 145
-      ? COLORS.crimson
-      : COLORS.amber;
-
-  return <GlitchOverlay intensity={intensity} tint={tint} />;
-};
-
 const getLyricAccent = (sec: number): string => {
-  if (sec < 71.94) return COLORS.nvLime;
-  if (sec < 121.9) return COLORS.amber;
-  if (sec >= 197.77 && sec < 201.99) return COLORS.amdRed;
-  if (sec >= 205.78 && sec < 209.72) return COLORS.cyan;
-  if (sec >= 220.06 && sec < 227.75) return COLORS.nvLime;
-  if (sec >= 227.75) return COLORS.gold;
+  if (sec < 71.52) return COLORS.nvLime;
+  if (sec < 121.52) return COLORS.amber;
+  if (sec >= 197.52 && sec < 201.52) return COLORS.amdRed;
+  if (sec >= 205.52 && sec < 209.52) return COLORS.cyan;
+  if (sec >= 219.52 && sec < 227.52) return COLORS.nvLime;
+  if (sec >= 227.52) return COLORS.gold;
   return COLORS.crimson;
 };
 
@@ -84,17 +32,18 @@ export const JensenPV: React.FC = () => {
   const { fps, durationInFrames } = useVideoConfig();
   const sec = frame / fps;
 
-  const f1 = secToFrame(39.89);
-  const f2 = secToFrame(55.82);
-  const f3 = secToFrame(71.94);
-  const f4 = secToFrame(88.1);
-  const f5 = secToFrame(105.86);
-  const f6 = secToFrame(121.9);
-  const f7 = secToFrame(153.66);
-  const f8 = secToFrame(169.73);
-  const f9 = secToFrame(186.02);
-  const f10 = secToFrame(201.99);
-  const f11 = secToFrame(220.06);
+  // All section cuts quantized strictly to true 4.000s downbeats
+  const f1 = secToFrame(39.52);
+  const f2 = secToFrame(55.52);
+  const f3 = secToFrame(71.52);
+  const f4 = secToFrame(87.52);
+  const f5 = secToFrame(105.52);
+  const f6 = secToFrame(121.52);
+  const f7 = secToFrame(153.52);
+  const f8 = secToFrame(169.52);
+  const f9 = secToFrame(185.52);
+  const f10 = secToFrame(201.52);
+  const f11 = secToFrame(219.52);
 
   return (
     <GlobalFrameProvider frame={frame}>
@@ -138,9 +87,9 @@ export const JensenPV: React.FC = () => {
           <Scene11FinalAndOutro />
         </Sequence>
 
-        <SceneGlitchLayer />
         <CinemaLyrics accentColor={getLyricAccent(sec)} />
       </AbsoluteFill>
     </GlobalFrameProvider>
   );
 };
+

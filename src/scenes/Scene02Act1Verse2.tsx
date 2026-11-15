@@ -1,38 +1,36 @@
 import React from "react";
 import { interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { COLORS } from "../design/tokens";
-import { useAudioFrame } from "../data/audio";
 import { CinemaStage } from "../cinema/CinemaStage";
 import { PhotoBackdrop, PhotoCutout } from "../cinema/PhotoMedia";
 import { GpuRig3D } from "../cinema/HardwareProps";
 import { RainGlassOverlay } from "../cinema/ArchitecturalSets";
 
-// Stanza 2 (55.82s - 71.94s, 967 frames)
+// Stanza 2 (55.52s - 71.52s, 960 frames / 16.00s)
 export const Scene02Act1Verse2: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const sec = frame / fps;
-  const audio = useAudioFrame();
 
-  const b0 = sec < 3.83; // 国会问我你究竟是哪里好
-  const b1 = sec >= 3.83 && sec < 7.92; // 台北酒吧我还忘不了
-  const b2 = sec >= 7.92 && sec < 11.77; // 股价再高也比不上你的笑
-  const b3 = sec >= 11.77; // 没买过卡的人不会明了
+  const b0 = sec < 4.0; // 国会问我你究竟是哪里好
+  const b1 = sec >= 4.0 && sec < 8.0; // 台北酒吧我还忘不了
+  const b2 = sec >= 8.0 && sec < 12.0; // 股价再高也比不上你的笑
+  const b3 = sec >= 12.0; // 没买过卡的人不会明了
 
   const b1In = spring({
-    frame: Math.max(0, frame - Math.round(3.83 * fps)),
+    frame: Math.max(0, frame - Math.round(3.92 * fps)),
     fps,
-    config: { damping: 24, stiffness: 80 },
+    config: { damping: 24, stiffness: 125 },
   });
-  const splitMove = interpolate(sec, [7.92, 11.5], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const splitMove = interpolate(sec, [8.0, 11.4], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
   return (
     <CinemaStage
       mood={b0 ? "noirGold" : b1 || b2 ? "amberBar" : "emeraldVault"}
-      camRotateY={b0 ? -2.5 : b1 ? 2.5 : Math.sin(sec * 0.9) * 3.5}
-      camZ={b1 ? (sec - 3.83) * 18 : 0}
+      camRotateY={b0 ? -2.0 : b1 ? 2.0 : Math.sin(sec * 0.4) * 2.0}
+      camZ={b1 ? (sec - 4.0) * 16 : 0}
       blinds={b0 ? 0.56 : 0}
-      rain={b1 ? 0.42 : 0.12}
+      rain={b1 ? 0.4 : 0.12}
       bokeh={0.78}
       anamorphicFlare={0.72}
     >
@@ -41,7 +39,6 @@ export const Scene02Act1Verse2: React.FC = () => {
         <div style={{ position: "absolute", inset: 0, transformStyle: "preserve-3d" }}>
           <PhotoBackdrop id="capitol" tone="noir" opacity={0.68} scale={1.06 + sec * 0.01} blurPx={2.5} />
 
-          {/* Sweeping overhead congressional interrogation spotlight */}
           <div style={{ position: "absolute", inset: -60, filter: "blur(28px)", pointerEvents: "none" }}>
             <div
               style={{
@@ -71,13 +68,12 @@ export const Scene02Act1Verse2: React.FC = () => {
         </div>
       )}
 
-      {/* Beat 1: Taipei Rain Bar — Unified Neon Bokeh + Amber Jensen + True-Alpha Rocks Whiskey Glass (Fixes image.png completely!) */}
+      {/* Beat 1: Taipei Rain Bar — Unified Neon Bokeh + Amber Jensen + Steady Rocks Whiskey Glass */}
       {b1 && (
         <div style={{ position: "absolute", inset: 0, opacity: b1In, transformStyle: "preserve-3d" }}>
-          <PhotoBackdrop id="taipei_neon" tone="amber" opacity={0.64} scale={1.08} panX={-(sec - 3.83) * 14} blurPx={4} />
+          <PhotoBackdrop id="taipei_neon" tone="amber" opacity={0.64} scale={1.08} panX={-(sec - 4.0) * 14} blurPx={4} />
           <RainGlassOverlay warmTint />
 
-          {/* Dark mahogany bar shelf reflection at lower third */}
           <div
             style={{
               position: "absolute",
@@ -93,7 +89,6 @@ export const Scene02Act1Verse2: React.FC = () => {
             }}
           />
 
-          {/* Moody Warm Amber-Lit Jensen Portrait at Bar Left */}
           <div
             style={{
               position: "absolute",
@@ -113,13 +108,12 @@ export const Scene02Act1Verse2: React.FC = () => {
             />
           </div>
 
-          {/* True-RGBA Crystal Whiskey Glass Resting Seamlessly on Foreground Bar Right */}
           <div
             style={{
               position: "absolute",
               right: 260,
               bottom: 125,
-              transform: `translateZ(105px) scale(${0.92 + b1In * 0.1 + audio.bass * 0.03})`,
+              transform: `translateZ(105px) scale(${0.92 + b1In * 0.08})`,
             }}
           >
             <PhotoCutout

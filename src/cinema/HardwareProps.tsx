@@ -19,7 +19,7 @@ export const GpuRig3D: React.FC<{
 }) => {
   const frame = useGlobalFrame();
   const audio = useAudioFrame();
-  const fanSpin = frame * (16 + audio.bass * 20);
+  const fanSpin = frame * 18;
   const glowCol = cracked ? COLORS.crimson : accent;
 
   return (
@@ -89,7 +89,7 @@ export const GpuRig3D: React.FC<{
           }}
         />
 
-        {/* Hourglass structural spine + pulsing energy vein */}
+        {/* Hourglass structural spine + smooth energy vein */}
         <svg
           viewBox="0 0 580 224"
           style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
@@ -107,7 +107,7 @@ export const GpuRig3D: React.FC<{
             y2="112"
             stroke={glowCol}
             strokeWidth="3.5"
-            opacity={0.7 + audio.pulse * 0.3}
+            opacity={0.7 + audio.rms * 0.28}
           />
         </svg>
 

@@ -5,30 +5,30 @@ import { useAudioFrame } from "../data/audio";
 import { CinemaStage } from "../cinema/CinemaStage";
 import { PhotoBackdrop, PhotoCutout } from "../cinema/PhotoMedia";
 
-// Stanza 9 (201.99s - 220.06s, 1085 frames)
+// Stanza 9 (201.52s - 219.52s, 1080 frames / 18.00s)
 export const Scene10Act2Chorus2: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const sec = frame / fps;
   const audio = useAudioFrame();
 
-  const b0 = sec < 3.79; // 是懂王荐库克也好
-  const b1 = sec >= 3.79 && sec < 7.73; // 是马斯克来挖人也好
-  const b2 = sec >= 7.73 && sec < 11.55; // 然而这一切已不再重要
-  const b3 = sec >= 11.55; // 老婆在加州把律师找好
+  const b0 = sec < 4.0; // 是懂王荐库克也好
+  const b1 = sec >= 4.0 && sec < 8.0; // 是马斯克来挖人也好
+  const b2 = sec >= 8.0 && sec < 12.0; // 然而这一切已不再重要
+  const b3 = sec >= 12.0; // 老婆在加州把律师找好
 
-  const doorsClose = interpolate(sec, [7.73, 10.9], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const doorsClose = interpolate(sec, [8.0, 11.1], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
-  // Gavel strike hits around 14.05s local -> full-screen vertical 50/50 split!
+  // Gavel strike hits around 14.15s local -> full-screen vertical 50/50 split
   const gavelStrike = spring({
-    frame: Math.max(0, frame - Math.round(13.65 * fps)),
+    frame: Math.max(0, frame - Math.round(13.85 * fps)),
     fps,
-    config: { damping: 14, stiffness: 260, mass: 0.9 },
+    config: { damping: 18, stiffness: 210, mass: 0.9 },
   });
   const gavelRot = interpolate(gavelStrike, [0, 1], [-28, 8]);
-  const impactRing = interpolate(sec, [14.05, 15.1], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const splitApart = interpolate(sec, [14.0, 16.2], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const gavelFadeOut = interpolate(sec, [14.35, 15.55], [1, 0], {
+  const impactRing = interpolate(sec, [14.15, 15.2], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const splitApart = interpolate(sec, [14.15, 16.4], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const gavelFadeOut = interpolate(sec, [14.45, 15.6], [1, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
@@ -52,11 +52,11 @@ export const Scene10Act2Chorus2: React.FC = () => {
 
           <svg viewBox="0 0 1920 1080" style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}>
             <polygon
-              points={`220,1080 560,1080 ${960 + Math.sin(sec * 2) * 150},-60 ${820 + Math.sin(sec * 2) * 150},-60`}
+              points={`220,1080 560,1080 ${960 + Math.sin(sec * 1.2) * 140},-60 ${820 + Math.sin(sec * 1.2) * 140},-60`}
               fill="rgba(245,166,35,0.16)"
             />
             <polygon
-              points={`1360,1080 1700,1080 ${1100 - Math.sin(sec * 2) * 150},-60 ${960 - Math.sin(sec * 2) * 150},-60`}
+              points={`1360,1080 1700,1080 ${1100 - Math.sin(sec * 1.2) * 140},-60 ${960 - Math.sin(sec * 1.2) * 140},-60`}
               fill="rgba(125,211,252,0.16)"
             />
           </svg>
@@ -73,22 +73,22 @@ export const Scene10Act2Chorus2: React.FC = () => {
       {/* Beat 1: Night SpaceX Rocket Blast + Real Elon Musk Cutout */}
       {b1 && (
         <div style={{ position: "absolute", inset: 0, transformStyle: "preserve-3d" }}>
-          <PhotoBackdrop id="falcon" tone="cyan" opacity={0.78} scale={1.08 + (sec - 3.79) * 0.015} />
+          <PhotoBackdrop id="falcon" tone="cyan" opacity={0.78} scale={1.08 + (sec - 4.0) * 0.015} />
           <svg viewBox="0 0 1920 1080" style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}>
             <line
               x1="240"
               y1="1080"
-              x2={interpolate(sec, [3.79, 7.6], [420, 1780])}
-              y2={interpolate(sec, [3.79, 7.6], [960, 110])}
+              x2={interpolate(sec, [4.0, 7.8], [420, 1780])}
+              y2={interpolate(sec, [4.0, 7.8], [960, 110])}
               stroke={COLORS.cyan}
-              strokeWidth={18 + audio.bass * 16}
+              strokeWidth={18 + audio.rms * 10}
               strokeLinecap="round"
             />
             <line
               x1="240"
               y1="1080"
-              x2={interpolate(sec, [3.79, 7.6], [420, 1780])}
-              y2={interpolate(sec, [3.79, 7.6], [960, 110])}
+              x2={interpolate(sec, [4.0, 7.8], [420, 1780])}
+              y2={interpolate(sec, [4.0, 7.8], [960, 110])}
               stroke="#FFFFFF"
               strokeWidth="6"
               strokeLinecap="round"

@@ -1,24 +1,22 @@
 import React from "react";
 import { interpolate, useCurrentFrame, useVideoConfig } from "remotion";
 import { COLORS } from "../design/tokens";
-import { useAudioFrame } from "../data/audio";
 import { CinemaStage } from "../cinema/CinemaStage";
 import { PhotoBackdrop, PhotoCutout } from "../cinema/PhotoMedia";
 import { hash01 } from "../cinema/math";
 
-// Stanza 7 (169.73s - 186.02s, 977 frames)
+// Stanza 7 (169.52s - 185.52s, 960 frames / 16.00s)
 export const Scene08Act2Verse2: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const sec = frame / fps;
-  const audio = useAudioFrame();
 
-  const b0 = sec < 3.86; // 股东问我窝边草是哪里好
-  const b1 = sec >= 3.86 && sec < 8.03; // 圣何塞那晚我忘不了
-  const b2 = sec >= 8.03 && sec < 11.79; // 期权再贵也比不上你的笑
-  const b3 = sec >= 11.79; // 没丢过官的人不会明了
+  const b0 = sec < 4.0; // 股东问我窝边草是哪里好
+  const b1 = sec >= 4.0 && sec < 8.0; // 圣何塞那晚我忘不了
+  const b2 = sec >= 8.0 && sec < 12.0; // 期权再贵也比不上你的笑
+  const b3 = sec >= 12.0; // 没丢过官的人不会明了
 
-  const corridorPush = interpolate(sec, [3.86, 8.03], [1.02, 1.32], {
+  const corridorPush = interpolate(sec, [4.0, 8.0], [1.02, 1.32], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
@@ -26,8 +24,8 @@ export const Scene08Act2Verse2: React.FC = () => {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const shutterFlash = Math.max(0, 1 - Math.abs(sec - 6.45) * 4.8);
-  const chairTurnDeg = interpolate(sec, [11.79, 15.8], [0, 180], {
+  const shutterFlash = Math.max(0, 1 - Math.abs(sec - 6.45) * 4.2);
+  const chairTurnDeg = interpolate(sec, [12.0, 15.8], [0, 180], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
@@ -40,7 +38,7 @@ export const Scene08Act2Verse2: React.FC = () => {
   return (
     <CinemaStage
       mood={b0 ? "emeraldVault" : b1 || b2 ? "amberBar" : "noirGold"}
-      camRotateY={b0 ? Math.sin(sec) * 3 : b3 ? 4 : 0}
+      camRotateY={b0 ? Math.sin(sec * 0.4) * 2.0 : b3 ? 3 : 0}
       rain={b0 ? 0.25 : 0.1}
       bokeh={b2 ? 0.85 : 0.55}
       anamorphicFlare={b1 ? 0.82 : 0.45}
@@ -52,7 +50,7 @@ export const Scene08Act2Verse2: React.FC = () => {
           <div
             style={{
               position: "absolute",
-              left: `${interpolate(sec, [0, 3.86], [-20, 100])}%`,
+              left: `${interpolate(sec, [0, 4.0], [-20, 100])}%`,
               top: -120,
               width: 320,
               height: 1300,
@@ -61,11 +59,11 @@ export const Scene08Act2Verse2: React.FC = () => {
             }}
           />
 
-          {/* Foreground organic swaying real green grass/leek cluster */}
+          {/* Foreground organic smoothly swaying green grass/leek cluster (zero audio jitter) */}
           {Array.from({ length: 13 }).map((_, g) => {
             const x = g * 155 + (hash01(g * 19) - 0.5) * 90;
             const sc = 0.72 + hash01(g * 31) * 0.52;
-            const sway = Math.sin(frame * 0.06 + g * 0.75) * (6 + audio.mid * 5);
+            const sway = Math.sin(sec * 1.15 + g * 0.75) * 6.5;
             return (
               <div
                 key={g}
@@ -92,7 +90,7 @@ export const Scene08Act2Verse2: React.FC = () => {
         </div>
       )}
 
-      {/* Beat 1: Authentic Dim Crimson Hotel Corridor Push-In + Soft Doorway Carpet Glow + Catch Flash */}
+      {/* Beat 1: Authentic Dim Crimson Hotel Corridor Push-In + Soft Doorway Carpet Glow */}
       {b1 && (
         <div style={{ position: "absolute", inset: 0, transformStyle: "preserve-3d" }}>
           <PhotoBackdrop id="corridor" tone="amber" opacity={0.88} scale={corridorPush} blurPx={0.8} translateZ={-40} />
@@ -140,8 +138,8 @@ export const Scene08Act2Verse2: React.FC = () => {
               style={{
                 position: "absolute",
                 inset: 0,
-                backgroundColor: "#FFFFFF",
-                opacity: shutterFlash * 0.85,
+                backgroundColor: "#FFF5DB",
+                opacity: shutterFlash * 0.48,
                 mixBlendMode: "screen",
               }}
             />
@@ -158,8 +156,8 @@ export const Scene08Act2Verse2: React.FC = () => {
           </div>
 
           {Array.from({ length: 22 }).map((_, i) => {
-            const p = ((sec - 8.03) * 0.42 + i * 0.08) % 1.25;
-            const x = hash01(i * 71) * 1920 + Math.sin(sec * 2 + i) * 70;
+            const p = ((sec - 8.0) * 0.42 + i * 0.08) % 1.25;
+            const x = hash01(i * 71) * 1920 + Math.sin(sec * 1.4 + i) * 70;
             const y = -100 + p * 1240;
             return (
               <div
@@ -173,8 +171,8 @@ export const Scene08Act2Verse2: React.FC = () => {
                   borderRadius: 3,
                   background: `linear-gradient(135deg, #FFF3CE 0%, ${COLORS.gold} 60%, #7C5210 100%)`,
                   boxShadow: `0 0 16px ${COLORS.amber}55`,
-                  transform: `translateZ(${(i % 4) * 100 - 150}px) rotateX(${frame * 2 + i * 30}deg) rotateZ(${
-                    i * 25 + frame
+                  transform: `translateZ(${(i % 4) * 100 - 150}px) rotateX(${sec * 75 + i * 30}deg) rotateZ(${
+                    i * 25 + sec * 45
                   }deg)`,
                   opacity: 0.76,
                 }}

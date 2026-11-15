@@ -7,32 +7,33 @@ import { PhotoBackdrop, PhotoCutout } from "../cinema/PhotoMedia";
 import { FoggyHighwayBeams, LakeRippleCanvas } from "../cinema/ArchitecturalSets";
 import { hash01 } from "../cinema/math";
 
-// Stanza 8 (186.02s - 201.99s, 958 frames)
+// Stanza 8 (185.52s - 201.52s, 960 frames / 16.00s)
 export const Scene09Act2Chorus1: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const sec = frame / fps;
   const audio = useAudioFrame();
 
-  const b0 = sec < 3.8; // 是华尔街逼宫也好
-  const b1 = sec >= 3.8 && sec < 7.76; // 是受惊鹿反咬也好
-  const b2 = sec >= 7.76 && sec < 11.75; // 然而一亿刀已全部打漂
-  const b3 = sec >= 11.75; // 表外甥女正捧着奖杯笑
+  const b0 = sec < 4.0; // 是华尔街逼宫也好
+  const b1 = sec >= 4.0 && sec < 8.0; // 是受惊鹿反咬也好
+  const b2 = sec >= 8.0 && sec < 12.0; // 然而一亿刀已全部打漂
+  const b3 = sec >= 12.0; // 表外甥女正捧着奖杯笑
 
-  const wallLean = interpolate(sec, [0, 3.5], [0, 7.5], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const queenTransform = interpolate(sec, [5.65, 6.25], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const chipSink = interpolate(sec, [7.76, 11.4], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const wallLean = interpolate(sec, [0, 3.6], [0, 7.5], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const queenTransform = interpolate(sec, [5.7, 6.3], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const chipSink = interpolate(sec, [8.0, 11.5], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const trophyRise = spring({
-    frame: Math.max(0, frame - Math.round(11.75 * fps)),
+    frame: Math.max(0, frame - Math.round(11.9 * fps)),
     fps,
-    config: { damping: 16, stiffness: 120 },
+    config: { damping: 20, stiffness: 120 },
   });
 
   return (
     <CinemaStage
       mood={b0 ? "crimsonAlarm" : b1 ? (queenTransform > 0.5 ? "emeraldVault" : "rainyBlue") : b2 ? "rainyBlue" : "amdScarlet"}
       camRotateX={b0 ? 6 : 2}
-      camRotateY={b3 ? Math.sin(sec * 1.4) * 5 : 0}
+      camRotateY={b3 ? 2.2 : 0}
+      camZ={b3 ? (sec - 12.0) * 12 : 0}
       rain={b1 ? 0.35 : 0.14}
       bokeh={0.78}
       anamorphicFlare={0.9}
@@ -190,10 +191,10 @@ export const Scene09Act2Chorus1: React.FC = () => {
                 key={b}
                 x1={960 + b * 320}
                 y1="1080"
-                x2={960 + Math.sin(sec * 2.5 + b) * 420}
+                x2={960 + Math.sin(sec * 1.1 + b) * 380}
                 y2="-60"
                 stroke={COLORS.amdRed}
-                strokeWidth={28 + audio.pulse * 22}
+                strokeWidth={28 + audio.rms * 14}
                 opacity="0.24"
               />
             ))}

@@ -5,30 +5,30 @@ import { useAudioFrame } from "../data/audio";
 import { CinemaStage } from "../cinema/CinemaStage";
 import { DocPlate, PhotoBackdrop, PhotoCutout } from "../cinema/PhotoMedia";
 
-// Stanza 5 (105.86s - 121.90s, 962 frames)
+// Stanza 5 (105.52s - 121.52s, 960 frames / 16.00s)
 export const Scene05Act1Bridge: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const sec = frame / fps;
   const audio = useAudioFrame();
 
-  const b0 = sec < 3.77; // 虽然老康总是笑笑的不计较
-  const b1 = sec >= 3.77 && sec < 7.96; // 虽然密电总是让人烦恼
-  const b2 = sec >= 7.96 && sec < 11.81; // 虽然芯片流向不能知道
-  const b3 = sec >= 11.81; // 现在发道歉会不会太早
+  const b0 = sec < 4.0; // 虽然老康总是笑笑的不计较
+  const b1 = sec >= 4.0 && sec < 8.0; // 虽然密电总是让人烦恼
+  const b2 = sec >= 8.0 && sec < 12.0; // 虽然芯片流向不能知道
+  const b3 = sec >= 12.0; // 现在发道歉会不会太早
 
-  const barsClose = interpolate(sec, [1.4, 3.3], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const sheetDrop = interpolate(sec, [11.81, 15.8], [-120, 460], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const sirenSide = Math.floor(frame / 14) % 2 === 0;
+  const barsClose = interpolate(sec, [1.2, 3.3], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const sheetDrop = interpolate(sec, [12.0, 15.8], [-120, 460], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const sirenBlend = (Math.sin(sec * 2.2) + 1) * 0.5;
 
   return (
     <CinemaStage
       mood={b0 ? "amberBar" : b1 ? "crimsonAlarm" : b2 ? "emeraldVault" : "noirGold"}
-      rain={b1 ? 0.52 : 0.16}
+      rain={b1 ? 0.45 : 0.15}
       bokeh={b3 ? 0.28 : 0.68}
       anamorphicFlare={b3 ? 0.25 : 0.72}
     >
-      {/* Beat 0: Warm Bar Toast Behind Heavy Vertical Cell Steel Bars Slamming + Sirens */}
+      {/* Beat 0: Warm Bar Toast Behind Heavy Vertical Cell Steel Bars Slamming + Smooth Sirens */}
       {b0 && (
         <div style={{ position: "absolute", inset: 0, transformStyle: "preserve-3d" }}>
           <PhotoBackdrop id="whiskey_bar" tone="amber" opacity={0.58} scale={1.08} blurPx={3} />
@@ -36,9 +36,11 @@ export const Scene05Act1Bridge: React.FC = () => {
             style={{
               position: "absolute",
               inset: 0,
-              background: sirenSide
-                ? "radial-gradient(circle at 25% 35%, rgba(255,46,76,0.34), transparent 60%)"
-                : "radial-gradient(circle at 75% 35%, rgba(56,189,248,0.34), transparent 60%)",
+              background: `radial-gradient(circle at 25% 35%, rgba(255,46,76,${
+                0.32 * sirenBlend
+              }), transparent 60%), radial-gradient(circle at 75% 35%, rgba(56,189,248,${
+                0.32 * (1 - sirenBlend)
+              }), transparent 60%)`,
               opacity: barsClose,
             }}
           />
@@ -93,7 +95,7 @@ export const Scene05Act1Bridge: React.FC = () => {
                   height="6"
                   rx="3"
                   fill={COLORS.crimson}
-                  opacity={0.45 + audio.high * 0.5}
+                  opacity={0.45 + audio.rms * 0.42}
                 />
               );
             })}

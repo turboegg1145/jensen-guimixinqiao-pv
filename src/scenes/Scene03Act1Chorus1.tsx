@@ -1,37 +1,35 @@
 import React from "react";
 import { interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { COLORS, FONTS } from "../design/tokens";
-import { useAudioFrame } from "../data/audio";
 import { CinemaStage } from "../cinema/CinemaStage";
 import { PhotoBackdrop, PhotoCutout } from "../cinema/PhotoMedia";
 import { GpuRig3D, SiliconWaferDisc } from "../cinema/HardwareProps";
 
-// Stanza 3 (71.94s - 88.10s, 970 frames)
+// Stanza 3 (71.52s - 87.52s, 960 frames / 16.00s)
 export const Scene03Act1Chorus1: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const sec = frame / fps;
-  const audio = useAudioFrame();
 
-  const b0 = sec < 3.75; // 是鬼迷了心窍也好
-  const b1 = sec >= 3.75 && sec < 7.92; // 是老康送秘书也好
-  const b2 = sec >= 7.92 && sec < 11.91; // 然而这一切已不再重要
-  const b3 = sec >= 11.91; // 只要你再订百亿显卡包
+  const b0 = sec < 4.0; // 是鬼迷了心窍也好
+  const b1 = sec >= 4.0 && sec < 8.0; // 是老康送秘书也好
+  const b2 = sec >= 8.0 && sec < 12.0; // 然而这一切已不再重要
+  const b3 = sec >= 12.0; // 只要你再订百亿显卡包
 
-  const slideSec = interpolate(sec, [3.75, 7.6], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const slideSec = interpolate(sec, [4.0, 7.6], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const gpuFlood = spring({
-    frame: Math.max(0, frame - Math.round(11.91 * fps)),
+    frame: Math.max(0, frame - Math.round(11.9 * fps)),
     fps,
-    config: { damping: 16, stiffness: 130 },
+    config: { damping: 20, stiffness: 150 },
   });
 
   return (
     <CinemaStage
       mood={b0 || b2 ? "crimsonAlarm" : b1 ? "amberBar" : "emeraldVault"}
-      camRotateX={b3 ? -10 : 2}
-      camRotateY={Math.sin(sec * 1.1) * 3.5}
-      camZ={b3 ? gpuFlood * 110 : 0}
-      rain={b0 ? 0.2 : b3 ? 0.35 : 0.1}
+      camRotateX={b3 ? -8 : 2}
+      camRotateY={Math.sin(sec * 0.4) * 2.0}
+      camZ={b3 ? gpuFlood * 105 : 0}
+      rain={b0 ? 0.2 : b3 ? 0.32 : 0.1}
       bokeh={0.78}
       anamorphicFlare={0.85}
     >
@@ -40,13 +38,12 @@ export const Scene03Act1Chorus1: React.FC = () => {
         <div style={{ position: "absolute", inset: 0, transformStyle: "preserve-3d" }}>
           <PhotoBackdrop id="wafer" tone="crimson" opacity={0.45} scale={1.08} blurPx={3} />
 
-          {/* Colossal "鬼" Glyph Raised Higher & Brighter Behind Portrait So Upper Crown Strokes Read Clearly */}
           <div
             style={{
               position: "absolute",
               left: "50%",
               top: "39%",
-              transform: `translate(-50%, -50%) translateZ(-160px) scale(${1 + audio.bass * 0.08})`,
+              transform: `translate(-50%, -50%) translateZ(-160px) scale(${1 + sec * 0.015})`,
               fontFamily: FONTS.serif,
               fontSize: 660,
               fontWeight: 900,
@@ -68,7 +65,7 @@ export const Scene03Act1Chorus1: React.FC = () => {
               opacity: 0.42,
             }}
           >
-            <SiliconWaferDisc size={620} spinDeg={frame * 0.75} tiltX={34} glowColor={COLORS.crimson} />
+            <SiliconWaferDisc size={620} spinDeg={sec * 36} tiltX={34} glowColor={COLORS.crimson} />
           </div>
 
           <div
@@ -89,7 +86,6 @@ export const Scene03Act1Chorus1: React.FC = () => {
         <div style={{ position: "absolute", inset: 0, transformStyle: "preserve-3d" }}>
           <PhotoBackdrop id="corridor" tone="amber" opacity={0.62} scale={1.08} blurPx={2.5} />
 
-          {/* Gliding Female Executive Across Center Amber Light Shaft */}
           <div
             style={{
               position: "absolute",
@@ -108,7 +104,6 @@ export const Scene03Act1Chorus1: React.FC = () => {
             />
           </div>
 
-          {/* Waiting Leather-Jacketed Jensen Right */}
           <div
             style={{
               position: "absolute",
@@ -129,22 +124,22 @@ export const Scene03Act1Chorus1: React.FC = () => {
         </div>
       )}
 
-      {/* Beat 2: Crimson Alarm Strobes Over Paparazzi Chaos & Closeup Jensen */}
+      {/* Beat 2: Crimson Alarm Smooth Sweep Over Paparazzi Chaos & Closeup Jensen (zero face scale thumping) */}
       {b2 && (
         <div style={{ position: "absolute", inset: 0, transformStyle: "preserve-3d" }}>
-          <PhotoBackdrop id="paparazzi" tone="crimson" opacity={0.58} scale={1.12} blurPx={2} />
+          <PhotoBackdrop id="paparazzi" tone="crimson" opacity={0.58} scale={1.1 + (sec - 8.0) * 0.015} blurPx={2} />
           {[0, 1, 2, 3, 4].map((ray) => (
             <div
               key={ray}
               style={{
                 position: "absolute",
-                left: `${((ray * 22 + frame * 1.4) % 120) - 10}%`,
+                left: `${((ray * 22 + (sec - 8.0) * 14) % 120) - 10}%`,
                 top: -200,
                 width: 140,
                 height: 1500,
                 transform: `rotate(${(ray % 2 === 0 ? 1 : -1) * 24}deg)`,
                 background: `linear-gradient(90deg, transparent, ${COLORS.crimson}44, transparent)`,
-                opacity: 0.45 + audio.pulse * 0.5,
+                opacity: 0.55,
               }}
             />
           ))}
@@ -153,7 +148,7 @@ export const Scene03Act1Chorus1: React.FC = () => {
               position: "absolute",
               left: "50%",
               bottom: 0,
-              transform: `translateX(-50%) translateZ(60px) scale(${1 + audio.bass * 0.06})`,
+              transform: `translateX(-50%) translateZ(60px) scale(${1 + (sec - 8.0) * 0.018})`,
             }}
           >
             <PhotoCutout id="jensen_closeup" tone="crimson" rimColor={COLORS.crimson} rimPx={34} height={830} />
@@ -167,7 +162,7 @@ export const Scene03Act1Chorus1: React.FC = () => {
           <PhotoBackdrop id="servers" tone="emerald" opacity={0.55} scale={1.1} />
           {Array.from({ length: 14 }).map((_, i) => {
             const x = 180 + (i % 5) * 390 + Math.sin(i * 2.1) * 40;
-            const ySpeed = ((frame * 12 + i * 240) % 1560) - 360;
+            const ySpeed = ((frame * 10 + i * 240) % 1560) - 360;
             const z = -420 + (i % 4) * 200;
             return (
               <div
@@ -186,7 +181,7 @@ export const Scene03Act1Chorus1: React.FC = () => {
                   <GpuRig3D
                     rotateX={14}
                     rotateY={(i % 2 === 0 ? 1 : -1) * 18}
-                    rotateZ={Math.sin(sec * 2 + i) * 6}
+                    rotateZ={Math.sin(sec * 1.1 + i) * 5}
                     accent={COLORS.nvLime}
                   />
                 )}
@@ -198,3 +193,4 @@ export const Scene03Act1Chorus1: React.FC = () => {
     </CinemaStage>
   );
 };
+
